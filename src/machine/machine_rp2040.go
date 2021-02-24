@@ -25,46 +25,18 @@ func (p Pin) Set(high bool) {
 
 // Configure this pin with the given I/O settings.
 func (p Pin) Configure(config PinConfig) {
-	// Set input enable on, output disable off
-	//    hw_write_masked(&padsbank0_hw->io[gpio],
-	//                   PADS_BANK0_GPIO0_IE_BITS,
-	//                   PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
-	//    );
-	//    // Zero all fields apart from fsel; we want this IO to do what the peripheral tells it.
-	//    // This doesn't affect e.g. pullup/pulldown, as these are in pad controls.
-	//    iobank0_hw->io[gpio].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
+	// Clear Output Enable bit
+	rp2040.SIO.GPIO_OE_CLR.SetBits(1 << 25)
 
-	switch p {
-	case 25:
-		rp2040.IO_BANK0.GPIO25_CTRL.Set(rp2040.IO_BANK0_GPIO0_CTRL_FUNCSEL_SIO_0 << rp2040.IO_BANK0_GPIO0_CTRL_FUNCSEL_Pos)
-	}
+	// Clear output output value
+	rp2040.SIO.GPIO_OUT_CLR.SetBits(1 << 25)
+
+	// Set Input enable, Clear output disable
+	rp2040.PADS_BANK0.GPIO25.ReplaceBits(rp2040.PADS_BANK0_GPIO0_IE_Msk, rp2040.PADS_BANK0_GPIO0_IE_Pos|rp2040.PADS_BANK0_GPIO0_OD_Pos, 0)
+
+	// Select function SIO
+	rp2040.IO_BANK0.GPIO25_CTRL.Set(rp2040.IO_BANK0_GPIO0_CTRL_FUNCSEL_SIO_0 << rp2040.IO_BANK0_GPIO0_CTRL_FUNCSEL_Pos)
+
+	// Select output enable
+	rp2040.SIO.GPIO_OE_SET.SetBits(1 << 25)
 }
-
-//---------- UART related types and code
-
-// UART representation
-//type UART struct {
-//	Buffer    *RingBuffer
-//	Bus       *rp2040.UART0_Type
-//	Interrupt interrupt.Interrupt
-//}
-
-// Configure the TX and RX pins
-//func (uart UART) configurePins(config UARTConfig) {
-
-// pins
-//switch config.TX {
-//case UART_ALT_TX_PIN:
-//	// use alternate TX/RX pins via AFIO mapping
-//	stm32.RCC.APB2ENR.SetBits(stm32.RCC_APB2ENR_AFIOEN)
-//	if uart.Bus == stm32.USART1 {
-//		stm32.AFIO.MAPR.SetBits(stm32.AFIO_MAPR_USART1_REMAP)
-//	} else if uart.Bus == stm32.USART2 {
-//		stm32.AFIO.MAPR.SetBits(stm32.AFIO_MAPR_USART2_REMAP)
-//	}
-//default:
-//	// use standard TX/RX pins PA9 and PA10
-//}
-//config.TX.Configure(PinConfig{Mode: PinOutput50MHz + PinOutputModeAltPushPull})
-//config.RX.Configure(PinConfig{Mode: PinInputModeFloating})
-//}
