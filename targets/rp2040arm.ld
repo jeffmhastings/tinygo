@@ -5,22 +5,10 @@ ENTRY(Reset_Handler)
 /* define output sections */
 SECTIONS
 {
-    .flash_begin : {
-        __flash_binary_start = .;
-    } > FLASH_TEXT
-
-    .boot2 : {
-        __boot2_start__ = .;
-        KEEP (*(.boot2))
-        __boot2_end__ = .;
-    } > FLASH_TEXT
-
-    ASSERT(__boot2_end__ - __boot2_start__ == 256,
-        "ERROR: Pico second stage bootloader must be 256 bytes in size")
-
     /* Program code and read-only data goes to FLASH_TEXT. */
     .text :
     {
+        KEEP (*(.boot2))
         KEEP(*(.isr_vector))
         *(.text)
         *(.text.*)
