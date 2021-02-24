@@ -3,11 +3,15 @@
         "cortex-m"
     ],
     "llvm-target": "armv6m-none-eabi",
-    "build-tags": ["rp2040"],
-    "flash-1200-bps-reset": "true",
-    "flash-method": "openocd",
-    "binary-format": "elf",
+    "build-tags": ["rp2040","raspberrypi-pico"],
+    "flash-method": "msd",
+    "binary-format": "uf2",
+    "uf2-family-id": "0xe48bff56",
     "linkerscript": "targets/rp2040.ld",
+    "gdb": "arm-none-eabi-gdb",
+    "openocd-interface": "picoprobe",
+    "openocd-target": "rp2040",
+    "openocd-transport": "swd",
     "cflags": [
         "--target=armv6m-none-eabi",
         "-Qunused-arguments"
